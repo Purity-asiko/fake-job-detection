@@ -15,7 +15,7 @@ app.secret_key = 'jobshield_secret_key_2024'
 
 # Database setup
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/Users/pc/jobshield.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jobshield.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
