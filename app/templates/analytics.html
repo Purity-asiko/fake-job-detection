@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobShield AI - Analytics</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; color: #fff; }
+        .navbar { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { font-size: 24px; font-weight: 700; }
+        .navbar h1 span { color: #6c63ff; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; }
+        .nav-links a:hover { color: #6c63ff; }
+        .logout-btn { padding: 8px 20px; background: rgba(255,50,50,0.2); border: 1px solid rgba(255,50,50,0.4); border-radius: 8px; color: #ff6b6b !important; }
+        .main { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h2 { font-size: 28px; margin-bottom: 25px; }
+        h2 span { color: #6c63ff; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; text-align: center; }
+        .stat-number { font-size: 42px; font-weight: 700; margin-bottom: 5px; }
+        .stat-label { color: rgba(255,255,255,0.5); font-size: 14px; }
+        .total .stat-number { color: #6c63ff; }
+        .fake .stat-number { color: #ff6b6b; }
+        .real .stat-number { color: #51cf66; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; }
+        .chart-card h3 { margin-bottom: 20px; font-size: 16px; color: rgba(255,255,255,0.8); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>JobShield <span>AI</span></h1>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/history">History</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+    <div class="main">
+        <h2>Analytics <span>Dashboard</span></h2>
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-number">{{ total }}</div>
+                <div class="stat-label">Total Analyses</div>
+            </div>
+            <div class="stat-card fake">
+                <div class="stat-number">{{ fake_count }}</div>
+                <div class="stat-label">Fake Jobs Detected</div>
+            </div>
+            <div class="stat-card real">
+                <div class="stat-number">{{ real_count }}</div>
+                <div class="stat-label">Real Jobs Verified</div>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📊 Fake vs Real Distribution</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 Detection Summary</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script>
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fake Jobs', 'Real Jobs'],
+                datasets: [{
+                    data: [{{ fake_percentage }}, {{ real_percentage }}],
+                    backgroundColor: ['rgba(255,107,107,0.8)', 'rgba(81,207,102,0.8)'],
+                    borderColor: ['#ff6b6b', '#51cf66'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: 'rgba(255,255,255,0.7)' } }
+                }
+            }
+        });
+
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fake Jobs', 'Real Jobs'],
+                datasets: [{
+                    label: 'Count',
+                    data: [{{ fake_count }}, {{ real_count }}],
+                    backgroundColor: ['rgba(255,107,107,0.6)', 'rgba(81,207,102,0.6)'],
+                    borderColor: ['#ff6b6b', '#51cf66'],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: 'rgba(255,255,255,0.7)' } }
+                },
+                scales: {
+                    y: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

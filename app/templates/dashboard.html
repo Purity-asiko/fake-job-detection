@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobShield AI - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 { font-size: 24px; font-weight: 700; }
+        .navbar h1 span { color: #6c63ff; }
+        .navbar-right { display: flex; align-items: center; gap: 20px; }
+        .username { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .logout-btn {
+            padding: 8px 20px;
+            background: rgba(255,50,50,0.2);
+            border: 1px solid rgba(255,50,50,0.4);
+            border-radius: 8px;
+            color: #ff6b6b;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover { background: rgba(255,50,50,0.4); }
+        .main { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .welcome {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .welcome h2 { font-size: 32px; margin-bottom: 10px; }
+        .welcome h2 span { color: #6c63ff; }
+        .welcome p { color: rgba(255,255,255,0.6); font-size: 16px; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        .card h3 { font-size: 20px; margin-bottom: 25px; color: #6c63ff; }
+        .form-group { margin-bottom: 20px; }
+        label { color: rgba(255,255,255,0.7); font-size: 14px; display: block; margin-bottom: 8px; }
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        input:focus, textarea:focus { border-color: #6c63ff; background: rgba(108,99,255,0.1); }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+        textarea { resize: vertical; min-height: 120px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6c63ff, #3b82f6);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(108,99,255,0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .result-card {
+            display: none;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .result-fake {
+            background: rgba(255,50,50,0.15);
+            border: 2px solid rgba(255,50,50,0.4);
+        }
+        .result-real {
+            background: rgba(50,255,100,0.15);
+            border: 2px solid rgba(50,255,100,0.4);
+        }
+        .result-icon { font-size: 60px; margin-bottom: 15px; }
+        .result-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+        .result-fake .result-title { color: #ff6b6b; }
+        .result-real .result-title { color: #51cf66; }
+        .result-confidence { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
+        .result-timestamp { font-size: 13px; color: rgba(255,255,255,0.4); }
+        .loading { display: none; text-align: center; padding: 20px; color: rgba(255,255,255,0.6); }
+        .upload-area {
+            border: 2px dashed rgba(108,99,255,0.4);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        .upload-area:hover { border-color: #6c63ff; background: rgba(108,99,255,0.1); }
+        .upload-area p { color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 10px; }
+        .upload-area input[type="file"] { display: none; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab {
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.3s;
+        }
+        .tab.active { background: #6c63ff; border-color: #6c63ff; color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>JobShield <span>AI</span></h1>
+        <div class="navbar-right">
+    <span class="username">👤 {{ username }}</span>
+    <a href="/analytics" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;">Analytics</a>
+    <a href="/history" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;">History</a>
+    <a href="/logout" class="logout-btn">Logout</a>
+</div>
+    </nav>
+
+    <div class="main">
+        <div class="welcome">
+            <h2>Welcome, <span>{{ username }}</span>!</h2>
+            <p>Paste or upload a job posting below to check if it's real or fake.</p>
+        </div>
+
+        <div class="card">
+            <h3>🔍 Job Posting Detector</h3>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('paste')">✏️ Paste Details</button>
+                <button class="tab" onclick="switchTab('upload')">📁 Upload File</button>
+            </div>
+
+            <div id="paste-tab" class="tab-content active">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Job Title</label>
+                        <input type="text" id="title" placeholder="e.g. Software Engineer">
+                    </div>
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="company" placeholder="e.g. Google">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Job Description</label>
+                    <textarea id="description" placeholder="Paste the job description here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Requirements</label>
+                    <textarea id="requirements" placeholder="Paste the job requirements here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Benefits</label>
+                    <textarea id="benefits" placeholder="Paste the job benefits here..."></textarea>
+                </div>
+            </div>
+
+            <div id="upload-tab" class="tab-content">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 40px;">📄</div>
+                    <p>Click to upload a job posting file (.txt)</p>
+                    <input type="file" id="fileInput" accept=".txt" onchange="handleFileUpload(event)">
+                </div>
+                <div id="file-content" style="display:none;">
+                    <div class="form-group">
+                        <label>File Content (Editable)</label>
+                        <textarea id="file-text" style="min-height:200px;" placeholder="File content will appear here..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="analyzeJob()" id="analyzeBtn">🔍 Analyze Job Posting</button>
+
+            <div class="loading" id="loading">
+                <p>⏳ Analyzing job posting...</p>
+            </div>
+
+           <div class="result-card" id="result">
+                <div class="result-icon" id="result-icon"></div>
+                <div class="result-title" id="result-title"></div>
+                <div class="result-confidence" id="result-confidence"></div>
+                <div class="result-timestamp" id="result-timestamp"></div>
+                
+                <div id="shap-section" style="margin-top:20px; text-align:left; display:none;">
+                    <h4 style="color:#6c63ff; margin-bottom:15px;">🧠 Why this prediction? (SHAP Explanation)</h4>
+                    <div id="shap-words"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+   function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('file-text').value = e.target.result;
+                    document.getElementById('file-content').style.display = 'block';
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        async function analyzeJob() {
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            const activeTab = document.querySelector('.tab-content.active').id;
+            
+            let formData = new FormData();
+            
+            if (activeTab === 'paste-tab') {
+                formData.append('title', document.getElementById('title').value);
+                formData.append('company', document.getElementById('company').value);
+                formData.append('description', document.getElementById('description').value);
+                formData.append('requirements', document.getElementById('requirements').value);
+                formData.append('benefits', document.getElementById('benefits').value);
+            } else {
+                const fileText = document.getElementById('file-text').value;
+                formData.append('description', fileText);
+            }
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+
+                if (data.result === 'FAKE JOB POSTING') {
+                    result.className = 'result-card result-fake';
+                    document.getElementById('result-icon').textContent = '🚨';
+                    document.getElementById('result-title').textContent = 'FAKE JOB POSTING';
+                } else {
+                    result.className = 'result-card result-real';
+                    document.getElementById('result-icon').textContent = '✅';
+                    document.getElementById('result-title').textContent = 'REAL JOB POSTING';
+                }
+
+                document.getElementById('result-confidence').textContent = 'Confidence: ' + data.confidence + '%';
+                document.getElementById('result-timestamp').textContent = 'Analyzed at: ' + data.timestamp;
+
+                if (data.explanations && data.explanations.length > 0) {
+                    var shapSection = document.getElementById('shap-section');
+                    var shapWords = document.getElementById('shap-words');
+                    shapSection.style.display = 'block';
+                    shapWords.innerHTML = '';
+                    
+                    data.explanations.forEach(function(exp) {
+                        var color = exp.direction === 'Suggests Fake' ? '#ff6b6b' : '#51cf66';
+                        var bar = document.createElement('div');
+                        bar.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 15px; margin-bottom:8px; background:rgba(255,255,255,0.05); border-radius:8px; border-left:4px solid ' + color + ';';
+                        bar.innerHTML = '<span style="font-weight:600;">' + exp.word + '</span><span style="color:' + color + '; font-size:13px;">' + exp.direction + '</span><span style="color:rgba(255,255,255,0.5); font-size:13px;">Score: ' + Math.abs(exp.importance).toFixed(4) + '</span>';
+                        shapWords.appendChild(bar);
+                    });
+                }
+
+                btn.disabled = false;
+            })
+            .catch(function(error) {
+                loading.style.display = 'none';
+                alert('Something went wrong. Please try again!');
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

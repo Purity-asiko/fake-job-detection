@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobShield AI - History</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; color: #fff; }
+        .navbar { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { font-size: 24px; font-weight: 700; }
+        .navbar h1 span { color: #6c63ff; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; transition: color 0.3s; }
+        .nav-links a:hover { color: #6c63ff; }
+        .logout-btn { padding: 8px 20px; background: rgba(255,50,50,0.2); border: 1px solid rgba(255,50,50,0.4); border-radius: 8px; color: #ff6b6b !important; }
+        .main { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h2 { font-size: 28px; margin-bottom: 25px; }
+        h2 span { color: #6c63ff; }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; color: rgba(255,255,255,0.5); font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: rgba(255,255,255,0.8); }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-fake { background: rgba(255,50,50,0.2); color: #ff6b6b; border: 1px solid rgba(255,50,50,0.3); }
+        .badge-real { background: rgba(50,255,100,0.2); color: #51cf66; border: 1px solid rgba(50,255,100,0.3); }
+        .empty { text-align: center; padding: 40px; color: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>JobShield <span>AI</span></h1>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/history">History</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+    <div class="main">
+        <h2>Prediction <span>History</span></h2>
+        <div class="card">
+            {% if predictions %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in predictions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ p.title or 'N/A' }}</td>
+                        <td>{{ p.company or 'N/A' }}</td>
+                        <td>
+                            <span class="badge {% if p.result == 'FAKE JOB POSTING' %}badge-fake{% else %}badge-real{% endif %}">
+                                {{ p.result }}
+                            </span>
+                        </td>
+                        <td>{{ p.confidence }}%</td>
+                        <td>{{ p.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty">
+                <p>No predictions yet. Go to the dashboard to analyze job postings!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
